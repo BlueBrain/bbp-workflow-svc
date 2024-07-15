@@ -1,0 +1,61 @@
+[build-system]
+requires = [
+    "setuptools>=64",
+    "setuptools_scm>=8"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bbp-workflow-svc"
+description = "Workflow launcher service"
+readme = { file = "README.rst", content-type = "text/x-rst" }
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "Blue Brain Project, EPFL" },
+]
+keywords = [
+  "computational neuroscience",
+  "BlueBrainProject",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Operating System :: POSIX",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Utilities",
+]
+dependencies = [
+  "bbp-workflow",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+docs = [
+  "sphinx-bluebrain-theme",
+]
+
+[project.urls]
+Homepage = "https://github.com/BlueBrain/bbp-workflow-svc"
+Documentation = "https://github.com/BlueBrain/bbp-workflow-svc"
+Repository = "https://github.com/BlueBrain/bbp-workflow-svc"
+Issues = "https://github.com/BlueBrain/bbp-workflow-svc/issues"
+
+[tool.setuptools.packages.find]
+include = ["bbp_workflow_svc"]
+namespaces = false
+
+[tool.setuptools_scm]
+local_scheme = "no-local-version"
+
+[tool.black]
+line-length = 100
+target-version = [
+    'py311',
+    'py312',
+]
+include = 'bbp_workflow_svc\/.*\.py$|tests\/.*\.py$|doc\/source\/conf\.py$|setup\.py$'
+
+[tool.isort]
+profile = "black"
+line_length = 100

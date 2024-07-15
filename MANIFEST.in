@@ -1,0 +1,1 @@
+global-exclude Makefile Dockerfile MANIFEST.in tox.ini tests/** .github/** .*
