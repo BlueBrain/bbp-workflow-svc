@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+  </head>
+  <script type="text/javascript"> 
+    async function post() {
+      const data = new FormData();
+      for (const li of document.getElementById('files').children) {
+        if (li.getElementsByTagName('input')[0].checked) {
+          txt = li.getElementsByTagName('textarea')[0];
+          data.append(txt.id, new Blob([txt.value]), txt.id);
+          if (txt.id.endsWith('.cfg') && !data.has('cfg_name')) { 
+            data.append('cfg_name', txt.id);
+          }
+        }
+      }
+      task = document.getElementById('task').value;
+      const response = await fetch(`/launch/${task}/`, {
+        method: 'POST',
+        body: data,
+      });
+      console.log(response);
+      if (response.status == 200) {
+        workflow = document.getElementById('workflow');
+        text = await response.text();
+        text = text.trim();
+        workflow.innerHTML = text;
+        workflow.href = text;
+      }
+    }
+  </script>
+  <body>
+    <select name="task" id="task">
+      <option>bbp_workflow.luigi.CompleteTask</option>
+      <option>bbp_workflow.sbo.task.RegisterBbpWorkflowConfig</option>
+      <option>bbp_workflow.sbo.circ.task.RegDetailedCircuitMeta</option>
+      <option>bbp_workflow.sbo.sim.task.GenSimCampaignMeta</option>
+      <option>bbp_workflow.sbo.sim.task.RunSimCampaignMeta</option>
+      <option>bbp_workflow.sbo.sim.task.RunSimCampaign</option>
+      <option>bbp_workflow.sbo.sim.task.ReportsSimCampaign</option>
+      <option>bbp_workflow.sbo.sim.task.ReportsSimCampaignMeta</option>
+      <option>bbp_workflow.sbo.viz.task.VideoSimCampaign</option>
+      <option>bbp_workflow.sbo.viz.task.VideoSimCampaignMeta</option>
+      <option>bbp_workflow.sbo.viz.task.RunAllSimCampaignMeta</option>
+    </select>
+
+    <button onclick="post()">post</button>
+    <a id="workflow" href="" target="_blank"></a>
+    <ul id="files" style="list-style-type:none">
+      <li>
+        <input type="checkbox"/>
+        <textarea id="meta.cfg" rows="10" cols="130">
+[DEFAULT]
+kg-org: tests
+kg-proj: workflow
+[RegDetailedCircuitMeta]
+config-url: https://sbo-nexus-delta.shapes-registry.org/v1/resources/tests/workflow/_/https:%%2F%%2Fsbo-nexus-delta.shapes-registry.org%%2Fdata%%2Ftest%%2Fworkflow%%2F97c0bb67-5458-43a1-8a1e-6546d813f9d8?rev=1
+[FindDetailedCircuitMeta]
+config-url: https://sbo-nexus-delta.shapes-registry.org/v1/resources/tests/workflow/_/https:%%2F%%2Fsbo-nexus-delta.shapes-registry.org%%2Fdata%%2Ftest%%2Fworkflow%%2F97c0bb67-5458-43a1-8a1e-6546d813f9d8?rev=1
+[GenSimCampaignMeta]
+config-url: https://sbo-nexus-delta.shapes-registry.org/v1/resources/tests/workflow/_/https:%%2F%%2Fsbo-nexus-delta.shapes-registry.org%%2Fdata%%2Ftest%%2Fworkflow%%2F968b3388-3229-4277-9b92-9b4a3ff5b010?rev=1
+[RunSimCampaignMeta]
+config-url: https://sbo-nexus-delta.shapes-registry.org/v1/resources/tests/workflow/_/https:%%2F%%2Fsbo-nexus-delta.shapes-registry.org%%2Fdata%%2Ftest%%2Fworkflow%%2F00f4b7c9-ea2c-4b97-b62d-c21df635c700?rev=1
+[ReportsSimCampaignMeta]
+config-url: https://sbo-nexus-delta.shapes-registry.org/v1/resources/tests/workflow/_/https:%%2F%%2Fsbo-nexus-delta.shapes-registry.org%%2Fdata%%2Ftest%%2Fworkflow%%2Ff67b2240-b905-41dd-95b1-ce3f5976bd1b?rev=1
+[VideoSimCampaignMeta]
+config-url: https://sbo-nexus-delta.shapes-registry.org/v1/resources/tests/workflow/_/https:%%2F%%2Fsbo-nexus-delta.shapes-registry.org%%2Fdata%%2Ftest%%2Fworkflow%%2F0b2ea3db-9b36-4ef0-a453-9d1243c9b6fa?rev=1</textarea>
+        <label for="meta.cfg">meta.cfg</label>
+      </li>
+      <li>
+        <input type="checkbox"/>
+        <textarea id="register.cfg" rows="7" cols="130">
+[DEFAULT]
+kg-org: tests
+kg-proj: workflow
+[RegisterBbpWorkflowConfig]
+# config-file-name: circuit.cfg
+# config-file-name: sim_gen.cfg
+# config-file-name: sim_run.cfg
+# config-file-name: sim_rep.cfg
+# config-file-name: sim_vid.cfg</textarea>
+        <label for="register.cfg">register.cfg</label>
+      </li>
+      <li>
+        <input type="checkbox"/>
+        <textarea id="circuit.cfg" rows="8" cols="130">
+[RegDetailedCircuit]
+name: Test
+description: Test description
+brain_region: {"url": "http://purl.obolibrary.org/obo/UBERON_0008933", "label": "primary somatosensory cortex"}
+species: {"url": "http://purl.obolibrary.org/obo/NCBITaxon_10116", "label": "Rattus norvegicus"}
+strain: {"url": "http://purl.obolibrary.org/obo/RS_0001833", "label": "Wistar Han"}
+circuit-type: Test Circuit
+circuit-config-path: /sbo/data/project/sim_benchmarks/O1_data_physiology/circuit_config.json</textarea>
+        <label for="circuit.cfg">circuit.cfg</label>
+      </li>
+      <li>
+        <input type="checkbox"/>
+        <textarea id="sim_gen.cfg" rows="8" cols="130">
+[GenSimCampaign]
+name: SBO SimCampaign test
+description: SBO SimCampaign test
+seed-as-coord: {"low": 100000, "high": 400000, "size": 1}
+attrs: {"path_prefix": "${HPC_PATH_PREFIX}/${USER}",
+        "blue_config_template": "simulation.tmpl",
+        "user_target": "node_sets.json",
+        "node_set": "test_all",
+        "duration": 1000}</textarea>
+        <label for="sim_gen.cfg">sim_gen.cfg</label>
+      </li>
+      <li>
+        <input type="checkbox"/>
+        <textarea id="sim_run.cfg" rows="4" cols="130">
+[RunSimCampaign]
+simulation-type: CortexNrdmsPySim
+nodes: 5
+time: 4:00:00
+partition: prod-mpi
+constraint: c7a.48xlarge</textarea>
+        <label for="sim_run.cfg">sim_run.cfg</label>
+      </li>
+      <li>
+        <input type="checkbox"/>
+        <textarea id="sim_rep.cfg" rows="4" cols="130">
+[ReportsSimCampaign]
+reports: {"spikes": {"raster": {"node_sets": ["test_all", "test_small"],
+                                "partition": "prod-batch",
+                                "constraint": "c7a.48xlarge"},
+                     "firing_rate_histogram": {"node_sets": ["test_all", "test_small"],
+                                               "partition": "prod-batch",
+                                               "constraint": "c7a.48xlarge"}},
+          "soma_report": {"trace": {"node_sets": ["test_small"],
+                                    "partition": "prod-batch",
+                                    "constraint": "c7a.48xlarge"}}}</textarea>
+        <label for="sim_rep.cfg">sim_rep.cfg</label>
+      </li>
+      <li>
+        <input type="checkbox"/>
+        <textarea id="sim_vid.cfg" rows="10" cols="130">
+[VideoSimCampaign]
+partition: prod-batch
+constraint: c7a.48xlarge
+populations: [{
+    "name": "S1nonbarrel_neurons",
+    "report_type": "compartment",
+    "report_name": "soma_report",
+    "density": 0.01,
+    "radius_multiplier": 10,
+    "load_soma": true,
+    "load_dendrites": false,
+    "load_axon": false }]
+resolution: [1920, 1080]
+camera-type: perspective
+camera-view: front
+background-color: [1, 1, 1, 0]
+fps: 10
+slowing-factor: 10
+start_frame: 0
+end_frame: -1</textarea>
+        <label for="sim_vid.cfg">sim_vid.cfg</label>
+      </li>
+      <li>
+        <input type="checkbox"/>
+        <textarea id="aws.cfg" rows="10" cols="130">
+[FindDetailedCircuit]
+circuit-config-path: /sbo/data/project/sim_benchmarks/O1_data_physiology/circuit_config.json
+[GenSimCampaign]
+name: SBO SimCampaign test
+description: SBO SimCampaign test
+config-id: aws-sbo-test-100ms
+seed-as-coord: {"low": 100000, "high": 400000, "size": 1}
+attrs: {"path_prefix": "${HPC_PATH_PREFIX}/${USER}",
+        "blue_config_template": "simulation.tmpl",
+        "user_target": "node_sets.json",
+        "node_set": "test_small",
+        "duration": 100}
+[RunSimCampaign]
+simulation-type: CortexNrdmsPySim
+partition: debug
+constraint:
+[ReportsSimCampaign]
+reports: {"spikes": {"raster": {"node_sets": ["test_all", "test_small"],
+                                "partition": "debug",
+                                "constraint": ""},
+                     "firing_rate_histogram": {"node_sets": ["test_all", "test_small"],
+                                               "partition": "debug",
+                                               "constraint": ""}},
+          "soma_report": {"trace": {"node_sets": ["test_small"],
+                                    "partition": "debug",
+                                    "constraint": ""}}}
+[VideoSimCampaign]
+partition: debug
+constraint:
+populations: [{
+    "name": "S1nonbarrel_neurons",
+    "report_type": "compartment",
+    "report_name": "soma_report",
+    "density": 0.01,
+    "radius_multiplier": 10,
+    "load_soma": true,
+    "load_dendrites": false,
+    "load_axon": false }]
+resolution: [1920, 1080]
+camera-type: perspective
+camera-view: front
+background-color: [1, 1, 1, 0]
+fps: 10
+slowing-factor: 10
+start_frame: 0
+end_frame: -1</textarea>
+        </textarea>
+        <label for="aws.cfg">aws.cfg</label>
+      </li>
+      <li>
+        <input type="checkbox"/>
+        <textarea id="bbp.cfg" rows="10" cols="130">
+[DEFAULT]
+account: proj30
+[FindDetailedCircuit]
+circuit-config-path: /gpfs/bbp.cscs.ch/project/proj83/jira-tickets/NSETM-1948-extract-hex-O1/data/O1_data_physiology/circuit_config.json
+[GenSimCampaign]
+name: SBO SimCampaign test
+description: SBO SimCampaign test
+config-id: sbo-test-100ms
+seed-as-coord: {"low": 100000, "high": 400000, "size": 1}
+attrs: {"path_prefix": "${HPC_PATH_PREFIX}/${USER}",
+        "blue_config_template": "simulation.tmpl",
+        "user_target": "node_sets.json",
+        "node_set": "test_small",
+        "duration": 100}
+[RunSimCampaign]
+simulation-type: CortexNrdmsPySim
+constraint: c7a.48xlarge
+[ReportsSimCampaign]
+reports: {"spikes": {"raster": {"node_sets": ["test_all", "test_small"]},
+                     "firing_rate_histogram": {"node_sets": ["test_all", "test_small"]}},
+          "soma_report": {"trace": {"node_sets": ["test_small"]}}}
+[VideoSimCampaign]
+populations: [{
+    "name": "S1nonbarrel_neurons",
+    "report_type": "compartment",
+    "report_name": "soma_report",
+    "density": 0.01,
+    "radius_multiplier": 10,
+    "load_soma": true,
+    "load_dendrites": false,
+    "load_axon": false }]
+resolution: [1920, 1080]
+camera-type: perspective
+camera-view: front
+background-color: [1, 1, 1, 0]
+fps: 10
+slowing-factor: 10
+start_frame: 0
+end_frame: -1</textarea>
+        <label for="bbp.cfg">bbp.cfg</label>
+      </li>
+      <li>
+        <input type="checkbox"/>
+        <textarea id="simulation.tmpl" rows="10" cols="130">
+{
+  "version": 1,
+  "target_simulator": "CORENEURON",
+  "network": "$circuit_config",
+  "node_sets_file": "node_sets.json",
+  "node_set": "$node_set",
+  "run": {
+    "dt": 0.025,
+    "random_seed": $seed,
+    "tstop": $duration
+  },
+  "output": {
+    "output_dir": "reporting",
+    "spikes_file": "spikes.h5"
+  },
+  "conditions": {
+    "extracellular_calcium": 1.05,
+    "v_init": -80.0,
+    "spike_location": "AIS",
+    "mechanisms": {
+      "ProbAMPANMDA_EMS": {
+        "init_depleted": true,
+        "minis_single_vesicle": true
+      },
+      "ProbGABAAB_EMS": {
+        "init_depleted": true,
+        "minis_single_vesicle": true
+      }
+    }
+  },
+  "inputs": {
+    "Stimulus gExc_L1": {
+      "input_type": "conductance",
+      "module": "relative_ornstein_uhlenbeck",
+      "delay": 250,
+      "duration": $duration,
+      "reversal": 0,
+      "tau": 2.7,
+      "mean_percent": 2.32,
+      "sd_percent": 0.928,
+      "node_set": "Layer1"
+    },
+    "Stimulus gExc_L23E": {
+      "input_type": "conductance",
+      "module": "relative_ornstein_uhlenbeck",
+      "delay": 250,
+      "duration": $duration,
+      "reversal": 0,
+      "tau": 2.7,
+      "mean_percent": 17.92,
+      "sd_percent": 7.168,
+      "node_set": "Layer23Excitatory"
+    },
+    "Stimulus gExc_L23I": {
+      "input_type": "conductance",
+      "module": "relative_ornstein_uhlenbeck",
+      "delay": 250,
+      "duration": $duration,
+      "reversal": 0,
+      "tau": 2.7,
+      "mean_percent": 0.446,
+      "sd_percent": 0.178,
+      "node_set": "Layer23Inhibitory"
+    },
+    "Stimulus gExc_L4E": {
+      "input_type": "conductance",
+      "module": "relative_ornstein_uhlenbeck",
+      "delay": 250,
+      "duration": $duration,
+      "reversal": 0,
+      "tau": 2.7,
+      "mean_percent": 8.606,
+      "sd_percent": 3.442,
+      "node_set": "Layer4Excitatory"
+    },
+    "Stimulus gExc_L4I": {
+      "input_type": "conductance",
+      "module": "relative_ornstein_uhlenbeck",
+      "delay": 250,
+      "duration": $duration,
+      "reversal": 0,
+      "tau": 2.7,
+      "mean_percent": 2.427,
+      "sd_percent": 0.971,
+      "node_set": "Layer4Inhibitory"
+    },
+    "Stimulus gExc_L5E": {
+      "input_type": "conductance",
+      "module": "relative_ornstein_uhlenbeck",
+      "delay": 250,
+      "duration": $duration,
+      "reversal": 0,
+      "tau": 2.7,
+      "mean_percent": 15.929,
+      "sd_percent": 6.372,
+      "node_set": "Layer5Excitatory"
+    },
+    "Stimulus gExc_L5I": {
+      "input_type": "conductance",
+      "module": "relative_ornstein_uhlenbeck",
+      "delay": 250,
+      "duration": $duration,
+      "reversal": 0,
+      "tau": 2.7,
+      "mean_percent": 3.845,
+      "sd_percent": 1.538,
+      "node_set": "Layer5Inhibitory"
+    },
+    "Stimulus gExc_L6E": {
+      "input_type": "conductance",
+      "module": "relative_ornstein_uhlenbeck",
+      "delay": 250,
+      "duration": $duration,
+      "reversal": 0,
+      "tau": 2.7,
+      "mean_percent": 2.339,
+      "sd_percent": 0.936,
+      "node_set": "Layer6Excitatory"
+    },
+    "Stimulus gExc_L6I": {
+      "input_type": "conductance",
+      "module": "relative_ornstein_uhlenbeck",
+      "delay": 250,
+      "duration": $duration,
+      "reversal": 0,
+      "tau": 2.7,
+      "mean_percent": 2.345,
+      "sd_percent": 0.938,
+      "node_set": "Layer6Inhibitory"
+    }
+  },
+  "connection_overrides": [
+    {
+      "name": "init",
+      "source": "hex0",
+      "target": "hex0",
+      "weight": 1.0
+    },
+    {
+      "name": "disconnect",
+      "source": "hex0",
+      "target": "hex0",
+      "delay": 0.025,
+      "weight": 0.0
+    },
+    {
+      "name": "reconnect",
+      "source": "hex0",
+      "target": "hex0",
+      "delay": 1000.0,
+      "weight": 1.0
+    }
+  ],
+  "reports": {
+    "soma_report": {
+      "cells": "test_all",
+      "variable_name": "v",
+      "sections": "soma",
+      "type": "compartment",
+      "dt": 0.1,
+      "start_time": 0,
+      "end_time": $duration
+    }
+  }
+}</textarea>
+        <label for="simulation.tmpl">simulation.tmpl</label>
+      </li>
+      <li>
+        <input type="checkbox"/>
+        <textarea id="node_sets.json" rows="6" cols="130">
+{
+  "test_small": {
+    "node_id": [7, 10, 11],
+    "population": "S1nonbarrel_neurons"
+  },
+  "test_all": {
+    "population": "S1nonbarrel_neurons"
+  }
+}</textarea>
+        <label for="node_sets.json">node_sets.json</label>
+      </li>
+    </ul>
+  </body>
+</html>
