@@ -6,9 +6,6 @@ on:
 jobs:
   push_latest:
     name: Push latest dockerhub image
-    env:
-      REGISTRY_IMAGE: 'bbp-workflow'
-      REGISTRY_IMAGE_TAG: 'latest'
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -26,4 +23,4 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ${{ vars.BBPBUILDBOT_DOCKERHUB_USER }}/${{ env.REGISTRY_IMAGE }}:${{ env.REGISTRY_IMAGE_TAG }}
+          tags: bluebrain/bbp-workflow:latest
