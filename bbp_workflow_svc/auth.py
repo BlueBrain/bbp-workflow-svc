@@ -12,13 +12,13 @@ from tornado import escape
 from tornado.auth import OAuth2Mixin
 from tornado.web import RequestHandler
 
-AUTH_HOST = os.environ["KC_HOST"]
-CLIENT_ID = os.environ["KC_CLIENT_ID"]
-REALM = os.environ["KC_REALM"]
-SECRET = os.environ["KC_SCR"]
-REDIRECT_URI = os.environ["REDIRECT_URI"]
-SUBJECT = os.environ["KC_SUB"]
-SESSION_ID = os.environ["SESSION_ID"]
+AUTH_HOST = os.getenv("KC_HOST")
+CLIENT_ID = os.getenv("KC_CLIENT_ID")
+REALM = os.getenv("KC_REALM")
+SECRET = os.getenv("KC_SCR")
+REDIRECT_URI = os.getenv("REDIRECT_URI")
+SUBJECT = os.getenv("KC_SUB")
+SESSION_ID = os.getenv("SESSION_ID")
 
 USER_INFO = f"{AUTH_HOST}/auth/realms/{REALM}/protocol/openid-connect/userinfo"
 

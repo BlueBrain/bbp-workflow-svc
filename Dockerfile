@@ -15,7 +15,7 @@ EXPOSE 8100
 
 WORKDIR /home/bbp-workflow
 
-COPY luigi.cfg ./
+COPY luigi.cfg /etc/luigi/luigi.cfg
 COPY logging.cfg ./
 
 ENV HOME=/home/bbp-workflow

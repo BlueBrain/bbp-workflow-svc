@@ -27,6 +27,7 @@ classifiers = [
 ]
 dependencies = [
   "bbp-workflow",
+  "sh",
 ]
 dynamic = ["version"]
 
