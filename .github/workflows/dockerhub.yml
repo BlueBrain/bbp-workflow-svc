@@ -1,0 +1,26 @@
+name: dockerhub
+
+on:
+  workflow_dispatch:
+
+jobs:
+  push_latest:
+    name: Push latest dockerhub image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+      - name: Build sdist
+        run: pipx run build --sdist
+      - name: Check dist metadata
+        run: pipx run twine check dist/*
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.BBPBUILDBOT_DOCKERHUB_USER }}
+          password: ${{ secrets.BBPBUILDBOT_DOCKERHUB_PASSWORD }}
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: bluebrain/bbp-workflow:latest
